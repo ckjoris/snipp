@@ -64,7 +64,10 @@ VERSION="0.3"
 PRINTER=(less -r)
 
 # disable color when piped
-[[ -t 1 ]] && COLORED=1 || COLORED=0
+# [[ -t 1 ]] && COLORED=1 || COLORED=0
+# nocolor by default
+COLORED=0
+
 WARNINGS=1
 ONLYPRINTSNIPPPATH=0
 
@@ -77,11 +80,13 @@ action_edit(){
   snippet_path=$SNIPP_BASEDIR$1
   $EDITOR "$snippet_path"
 }
+
 action_list(){
   ls $SNIPP_BASEDIR
   echo ''
   echo "can't find what you are looking for? Try \`tldr\`"
 }
+
 action_delete(){
   snippet_path=$SNIPP_BASEDIR$1
   if [ -f "$snippet_path" ]; then
@@ -91,6 +96,7 @@ action_delete(){
     exit 1
   fi
 }
+
 action_show(){
   snippet_path=$SNIPP_BASEDIR$1
 
@@ -115,13 +121,13 @@ action_show(){
   fi
 }
 
-
 filter_snipp_meta(){
     # delete first line if it contains 'syntax:'
     sed '1,2{;/syntax:.*/d;}' < "$snippet_path" > "$TMP"
     # then delete first line if blank
     sed '1{/^$/d}' -i $TMP
 }
+
 show_colored(){
   if hash pygmentize 2>/dev/null; then
     detect_pygments_lexer "$1"
@@ -134,7 +140,7 @@ show_colored(){
     # cmd=(ps -a -u -x)
     # "${cmd[@]}"
 
-    _OPT=(-g "${_OPT_FORMATTER[@]}" "${_OPT[@]}")
+    _OPT=(-O style=colorful "${_OPT_FORMATTER[@]}" "${_OPT[@]}")
     pygmentize "${_OPT[@]}" "$TMP" | "${PRINTER[@]}"
   else
     warn "install python library 'pygments' for snippet syntax highlighting (pip install pygments)"
@@ -142,6 +148,7 @@ show_colored(){
     "${PRINTER[@]}" "$TMP"
   fi
 }
+
 detect_pygments_lexer(){
   _OPT=()
   if [ -z "${1//[^.]/}" ]; then
@@ -158,11 +165,10 @@ detect_pygments_lexer(){
     if [ -n "$lexer" ]; then
       _OPT=(-l "$lexer")
     else
-      _OPT=()
+      _OPT=(-g) # guess
     fi
   fi
 }
-
 
 # --------- PARSE INPUT/OPTIONS
 
