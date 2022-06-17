@@ -11,10 +11,11 @@ usage(){
 Manage text snippets.
 
  Actions:
-    edit   | e        Edit the specified snippet, using \$EDITOR
-    show   | s        Show the specified snippet
-    list   | ls       List all snippets
-    remove | rm       Remove a snippet
+    edit     | e        Edit the specified snippet, using \$EDITOR
+    show     | s        Show the specified snippet
+    list     | ls       List all snippets
+    search   | se       Search snippets
+    remove   | rm       Remove a snippet
  Options:
     -p, --print       Show snippet without a pager
     -h, --help        Display this help and exit
@@ -121,6 +122,20 @@ action_show(){
   fi
 }
 
+action_search(){
+  # file name search with FZF
+
+  G_DIR=$(
+    cd $SNIPP_BASEDIR >/dev/null || return
+    find . -path '*/\.*' -prune -o -type f -print -o -type l -print 2>/dev/null | fzf
+  )
+  [[ -z "${G_DIR}" ]] && return
+
+  pushd $SNIPP_BASEDIR
+  nvim "${G_DIR}"
+  popd
+}
+
 filter_snipp_meta(){
     # delete first line if it contains 'syntax:'
     sed '1,2{;/syntax:.*/d;}' < "$snippet_path" > "$TMP"
@@ -207,6 +222,9 @@ case $1 in
     require_arguments "$@";
     SNIPPET=$(echo -e "${2//\//_}")
     action_delete "$SNIPPET"
+  ;;
+  se|search)
+    action_search
   ;;
   *)
     action_show "$1"
