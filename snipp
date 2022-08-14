@@ -67,7 +67,7 @@ PRINTER=(less -r)
 # disable color when piped
 # [[ -t 1 ]] && COLORED=1 || COLORED=0
 # nocolor by default
-COLORED=0
+COLORED=1
 
 WARNINGS=1
 ONLYPRINTSNIPPPATH=0
