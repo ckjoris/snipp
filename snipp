@@ -155,7 +155,7 @@ show_colored(){
     # cmd=(ps -a -u -x)
     # "${cmd[@]}"
 
-    _OPT=(-O style=colorful "${_OPT_FORMATTER[@]}" "${_OPT[@]}")
+    _OPT=("${_OPT_FORMATTER[@]}" "${_OPT[@]}")
     pygmentize "${_OPT[@]}" "$TMP" | "${PRINTER[@]}"
   else
     warn "install python library 'pygments' for snippet syntax highlighting (pip install pygments)"
