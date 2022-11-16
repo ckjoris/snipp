@@ -108,14 +108,17 @@ action_show(){
 
   if [ -f "$snippet_path" ]; then
 
-    TMP=/tmp/snipp
+    base_filename=$(basename -- "$snippet_path")
+    TMP=/tmp/snipp-$base_filename
 
     if [ $COLORED == 1 ]; then
-      show_colored "$snippet_path"
+      # show_colored "$snippet_path"
+      show_colored_bat "$snippet_path"
     else
       filter_snipp_meta
       "${PRINTER[@]}" "$TMP"
     fi
+    rm "$TMP"
   else
     warn "** Snippet '$1' does not exist **"
     exit 1
@@ -146,6 +149,10 @@ filter_snipp_meta(){
 show_colored(){
   if hash pygmentize 2>/dev/null; then
     detect_pygments_lexer "$1"
+    if [ ${#_OPT[@]} -eq 0 ]; then
+      _OPT=(-g) # guess or use file extension
+    fi
+
     filter_snipp_meta
     if [[ $(tput colors) -eq 256 ]]; then # todo check for true color support
       _OPT_FORMATTER=(-f console256)
@@ -159,6 +166,21 @@ show_colored(){
     pygmentize "${_OPT[@]}" "$TMP" | "${PRINTER[@]}"
   else
     warn "install python library 'pygments' for snippet syntax highlighting (pip install pygments)"
+    filter_snipp_meta
+    "${PRINTER[@]}" "$TMP"
+  fi
+}
+
+show_colored_bat(){
+  if hash bat 2>/dev/null; then
+    detect_pygments_lexer "$1"
+    filter_snipp_meta
+
+    _OPT=( "${_OPT[@]}")
+    # bat --style plain "${_OPT[@]}" "$TMP" | "${PRINTER[@]}"
+    bat --style plain "${_OPT[@]}" "$TMP" --paging auto
+  else
+    warn "install 'bat' for snippet syntax highlighting"
     filter_snipp_meta
     "${PRINTER[@]}" "$TMP"
   fi
@@ -179,8 +201,6 @@ detect_pygments_lexer(){
     lexer=${lexer% *}
     if [ -n "$lexer" ]; then
       _OPT=(-l "$lexer")
-    else
-      _OPT=(-g) # guess
     fi
   fi
 }
