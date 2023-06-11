@@ -79,6 +79,11 @@ fi
 # ACTIONS
 action_edit(){
   snippet_path=$SNIPP_BASEDIR$1
+
+  if [ -f "${snippet_path}.md" ]; then
+    snippet_path="${snippet_path}.md"
+  fi
+
   $EDITOR "$snippet_path"
 }
 
@@ -104,6 +109,10 @@ action_show(){
   if [ $ONLYPRINTSNIPPPATH == 1 ]; then
     echo "$snippet_path"
     exit 0
+  fi
+
+  if [ -f "${snippet_path}.md" ]; then
+    snippet_path="${snippet_path}.md"
   fi
 
   if [ -f "$snippet_path" ]; then
