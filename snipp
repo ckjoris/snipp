@@ -14,7 +14,8 @@ Manage text snippets.
     edit     | e        Edit the specified snippet, using \$EDITOR
     show     | s        Show the specified snippet
     list     | ls       List all snippets
-    search   | se       Search snippets
+    search   | se       Search snippets by filename
+    grep     | g        Search snippets by content (grep-like)
     remove   | rm       Remove a snippet
  Options:
     -p, --print       Show snippet without a pager
@@ -61,7 +62,7 @@ else
   SNIPP_BASEDIR=$SNIPP_DEFAULT_BASEDIR
 fi
 
-VERSION="0.3"
+VERSION="0.4"
 PRINTER=(less -r)
 
 # disable color when piped
@@ -134,18 +135,44 @@ action_show(){
   fi
 }
 
-action_search(){
+action_search (){
   # file name search with FZF
+  shift
+  query="$@"
 
   G_DIR=$(
     cd $SNIPP_BASEDIR >/dev/null || return
-    find . -path '*/\.*' -prune -o -type f -print -o -type l -print 2>/dev/null | fzf
+    rg --files | fzf --query "$query"
   )
   [[ -z "${G_DIR}" ]] && return
 
   pushd $SNIPP_BASEDIR
   nvim "${G_DIR}"
   popd
+}
+
+action_grep(){
+  shift
+  query="$@"
+  selection=$(
+    cd $SNIPP_BASEDIR >/dev/null || return
+
+    rg --color=always --line-number --no-heading --smart-case "$query" | \
+      fzf --query "$query" \
+      --ansi \
+      --color "hl:-1:underline,hl+:-1:underline:reverse" \
+      --delimiter : \
+      --bind='change:reload(rg --color=always --line-number --no-heading --smart-case {q})' \
+      --preview='bat --style=numbers --color=always --highlight-line {2} {1}' \
+      
+  )
+  [[ -z "${selection}" ]] && return
+  file=$(echo "$selection" | cut -d ':' -f 1)
+  line=$(echo "$selection" | cut -d ':' -f 2)
+
+  pushd $SNIPP_BASEDIR || exit 1
+  nvim "${file}" "+${line}"
+  popd || exit 1
 }
 
 filter_snipp_meta(){
@@ -253,7 +280,10 @@ case $1 in
     action_delete "$SNIPPET"
   ;;
   se|search)
-    action_search
+    action_search "$@"
+  ;;
+  g|grep)
+    action_grep "$@"
   ;;
   *)
     action_show "$1"
