@@ -3,19 +3,21 @@ snipp
 
 Code/text snippets for the command line
 
-Tired of IDE dependent snippet plugins ? Here is a pure bash solution.
+Uses pygments & bat to highlight syntax
 
-Snipp uses pygments to highlight syntax, and supports 8 or 256 color terminals.
+Has commands to search, grep, list, edit.. and more
 
-Use `snipp help` for documentation, its very simple
+Searching/Grepping is quick and interactive with ripgrep and fzf.
+
+Use `snipp help` for documentation
 
 tested only on linux but should work in any bash environment.
 
 dependencies:
  bash
+ ripgrep
+ bat
+ fzf
 optional dependecies:
  pygments
  tput
-
-license:
-  MIT (basically do whatever you want)

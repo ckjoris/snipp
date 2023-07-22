@@ -164,7 +164,6 @@ action_grep(){
       --delimiter : \
       --bind='change:reload(rg --color=always --line-number --no-heading --smart-case {q})' \
       --preview='bat --style=numbers --color=always --highlight-line {2} {1}' \
-      
   )
   [[ -z "${selection}" ]] && return
   file=$(echo "$selection" | cut -d ':' -f 1)
