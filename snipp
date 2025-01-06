@@ -213,7 +213,7 @@ show_colored_bat(){
 
     _OPT=( "${_OPT[@]}")
     # bat --style plain "${_OPT[@]}" "$TMP" | "${PRINTER[@]}"
-    bat --style plain "${_OPT[@]}" "$TMP" --paging auto
+    bat --color=always --style plain "${_OPT[@]}" "$TMP" --paging auto
   else
     warn "install 'bat' for snippet syntax highlighting"
     filter_snipp_meta
