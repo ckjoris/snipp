@@ -11,19 +11,19 @@ usage(){
 Manage text snippets.
 
  Actions:
-    edit     | e        Edit the specified snippet, using \$EDITOR
-    show     | s        Show the specified snippet
-    list     | ls       List all snippets
-    search   | se       Search snippets by filename
-    grep     | g        Search snippets by content (grep-like)
-    remove   | rm       Remove a snippet
+    edit     | e               Edit the specified snippet, using \$EDITOR
+    show     | s               Show the specified snippet
+    list     | ls              List all snippets
+    search   | se              Search snippets by filename
+    grep     | g               Search snippets by content (grep-like)
+    remove   | rm              Remove a snippet
  Options:
-    -p, --print       Show snippet without a pager
-    -h, --help        Display this help and exit
-    -v, --version     Output version information and exit
-        --nocolor     Disable color
-        --nowarn      Disable warnings
-        --printpath   Prints the snippet file's path, and exits. Only for show action.
+    -p, --print                Show snippet without a pager
+    -h, --help                 Display this help and exit
+    -v, --version              Output version information and exit
+        --nocolor|--no-color   Disable color
+        --nowarn               Disable warnings
+        --printpath            Prints the snippet file's path, and exits. Only for show action.
 
  Examples:
     snipp show bash  # shows snippet on bash
@@ -65,10 +65,10 @@ fi
 VERSION="0.4"
 PRINTER=(less -r)
 
-# disable color when piped
-# [[ -t 1 ]] && COLORED=1 || COLORED=0
 # nocolor by default
 COLORED=1
+# disable color when piped
+[[ -t 1 ]] && COLORED=1 || COLORED=0
 
 WARNINGS=1
 ONLYPRINTSNIPPPATH=0
@@ -251,6 +251,7 @@ while [[ $1 = -?* ]]; do
     -v|--version) echo "$(basename "$0") $VERSION"; exit 0 ;;
     -p|--print) PRINTER=(cat) ;;
     --nocolor) COLORED=0 ;;
+    --no-color) COLORED=0 ;;
     --nowarn) WARNINGS=0 ;;
     --printpath) ONLYPRINTSNIPPPATH=1 ;;
     --endopts) shift; break ;;
